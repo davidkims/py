@@ -1,0 +1,34 @@
+import requests
+
+def get_repository_files(repo_url):
+    # GitHub API 요청 헤더 설정 (User-Agent는 필수)
+    headers = {
+        "User-Agent": "My-GitHub-App"
+    }
+    
+    # 주어진 GitHub 저장소 URL에서 사용자명과 저장소명 추출
+    parts = repo_url.rstrip('/').split('/')
+    username = parts[-2]
+    repo_name = parts[-1]
+    
+    # GitHub API에서 저장소 내용 가져오기
+    api_url = f"https://api.github.com/repos/{username}/{repo_name}/contents"
+    response = requests.get(api_url, headers=headers)
+    
+    if response.status_code == 200:
+        files = response.json()
+        file_names = [file['name'] for file in files]
+        return file_names
+    else:
+        print(f"Failed to fetch repository contents. Status code: {response.status_code}")
+        return []
+
+repo_url = "https://github.com/davidkims/py"
+file_list = get_repository_files(repo_url)
+
+if file_list:
+    print("Files in the repository:")
+    for file_name in file_list:
+        print(file_name)
+else:
+    print("No files found in the repository.")
